@@ -52,7 +52,7 @@ defmodule Pengx do
     chunk_data = <<>>
     <<
       byte_size(data)       :: 32,
-      chunk_type            :: 32,
+      chunk_type            :: binary,
       chunk_data            :: binary,
       Pengx.CRC.crc32(<<chunk_type :: binary, data::binary>>) :: 32
     >>
