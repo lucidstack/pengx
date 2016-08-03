@@ -13,11 +13,10 @@ defmodule Pngcheck do
 
   def pngcheck(data) do
     pngcheck_installed!
-    Application.put_env(:porcelain, :goon_warn_if_missing, false)
     Application.ensure_started(:porcelain)
 
     proc = %Proc{pid: pid} = Porcelain.spawn_shell(
-      "pngcheck",
+      "pngcheckf",
       in: :receive,
       out: {:send, self()}
     )

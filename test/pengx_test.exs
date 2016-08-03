@@ -10,7 +10,7 @@ defmodule PengxTest do
     width = 200
     height =100
     background = %Color{r: 255, g: 127, b: 63}
-    {:ok, pengx} = Pengx.new(width, height, background)
+    pengx = %Pengx{width: 400, height: 200}
     {:ok, data} = Pengx.render(pengx)
     assert {_output_data, @success} = Pngcheck.pngcheck(data)
   end
