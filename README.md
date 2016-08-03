@@ -1,24 +1,9 @@
 # Pengx
 
-**TODO: Add description**
+Pure Elixir PNG encoding library with no dependencies.
 
-## Installation
+Status: not even close to doing anything. Hacking on bits and pieces of code.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
-
-  1. Add `pengx` to your list of dependencies in `mix.exs`:
-
-    ```elixir
-    def deps do
-      [{:pengx, "~> 0.1.0"}]
-    end
-    ```
-
-  2. Ensure `pengx` is started before your application:
-
-    ```elixir
-    def application do
-      [applications: [:pengx]]
-    end
-    ```
-
+Why: Because I was bored and it seemed like a good idea, and I wanted a way to
+write PNGs for another project I'm thinking of writing, and realised that I
+should totally write that library as well.
