@@ -1,4 +1,4 @@
 defmodule Pengx.CRCTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Pengx.CRC
 end

@@ -1,5 +1,5 @@
 defmodule PengxTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Pengx
 
   alias Pengx.Color
