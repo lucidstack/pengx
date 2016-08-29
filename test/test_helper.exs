@@ -15,27 +15,10 @@ defmodule Pngcheck do
     pngcheck_installed!
     Application.ensure_started(:porcelain)
 
-    proc = %Proc{pid: pid} = Porcelain.spawn_shell(
-      "pngcheckf",
-      in: :receive,
-      out: {:send, self()}
-    )
+    Temp.track!
+    {:ok, file_path} = Temp.open "test_png.png", &IO.binwrite(&1, data)
+    %Result{out: output, status: status} = Porcelain.exec("pngcheck", [file_path])
 
-   Proc.send_input(proc, data)
-   Proc.send_input(proc, "\n")
-
-   output_data = receive do
-     {^pid, :data, :out, output_data} -> output_data
-   after
-     5000 -> raise "no output received from pngcheck within 5 seconds"
-   end
-
-   status = receive do
-     {^pid, :result, %Result{status: status}} -> status
-   after
-     5000 -> raise "no status received from pngcheck within 5 seconds"
-   end
-
-   {output_data, status}
+    {output, status}
   end
 end

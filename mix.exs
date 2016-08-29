@@ -28,7 +28,8 @@ defmodule Pengx.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:porcelain, "~> 2.0", only: :test}
+      {:porcelain, "~> 2.0", only: :test},
+      {:temp, "~> 0.4", only: :test}
     ]
   end
 end
