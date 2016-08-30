@@ -15,10 +15,21 @@ defmodule Pngcheck do
     pngcheck_installed!
     Application.ensure_started(:porcelain)
 
-    Temp.track!
+    unless keep_pngs? do
+      Temp.track!
+    end
+
     {:ok, file_path} = Temp.open "test_png.png", &IO.binwrite(&1, data)
+    if keep_pngs? do
+      IO.puts "png=#{file_path}"
+    end
     %Result{out: output, status: status} = Porcelain.exec("pngcheck", [file_path])
 
     {output, status}
   end
+
+  defp keep_pngs? do
+    System.get_env("KEEP_PNGS") != nil
+  end
+
 end

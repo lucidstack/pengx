@@ -1,14 +1,22 @@
 defmodule Pengx do
+  alias Pengx.Color, as: Color
+  alias Pengx.ColorType, as: ColorType
+  alias Pengx.Data, as: Data
+  alias Pengx.Palette, as: Palette
+  alias Pengx.Scanline, as: Scanline
+
   defstruct \
     width: 0,
     height: 0,
     bit_depth: 1,
-    color_type: Pengx.ColorType.greyscale,
+    color_type: ColorType.greyscale,
     compression_method: 0, # only ever 0
     filter_method: 0, # only ever 0
-    interlace_method: 0 # can be 0 or 1
+    interlace_method: 0, # can be 0 or 1
+    palette: %Palette{},
+    data: %Data{}
 
-  def render(pengx = %Pengx{}) do
+  def encode(pengx = %Pengx{}) do
     signature = <<0x89, ?P, ?N, ?G, 0x0D, 0x0A, 0x1A, 0x0A>>
     data = <<signature :: binary, chunks(pengx) :: binary>>
     {:ok, data}
@@ -27,7 +35,7 @@ defmodule Pengx do
     width: width,
     height: height,
     bit_depth: bit_depth,
-    color_type: %Pengx.ColorType{type: color_type},
+    color_type: %ColorType{type: color_type},
     compression_method: compression_method,
     filter_method: filter_method,
     interlace_method: interlace_method
@@ -44,17 +52,32 @@ defmodule Pengx do
     chunk("IHDR", data)
   end
 
-  defp chunk_PLTE(_pengx), do: <<>>
-  defp chunk_IDAT(_pengx), do: <<>>
-  defp chunk_IEND(_pengx), do: <<>>
+  defp chunk_PLTE(%Pengx{ palette: %Palette{ colors: [] } }), do: <<>>
 
-  defp chunk(chunk_type, data) do
-    chunk_data = <<>>
+  defp chunk_PLTE(%Pengx{ palette: %Palette{ colors: colors } }) do
+    data = colors |> Enum.map(fn(%Color{r: r, g: g, b: b}) ->
+      <<r::8, g::8, b::8>>
+    end)
+    chunk("PLTE", data)
+  end
+
+  defp chunk_IDAT(%Pengx{ data: %Data{ scanlines: scanlines } }) do
+    data = scanlines |> Enum.map(
+      fn(%Scanline{ filter_type: ft, pixels: pixels}) ->
+        <<ft::8, pixels::binary>>
+      end
+    )
+    chunk("IDAT", :zlib.compress(data))
+  end
+
+  defp chunk_IEND(_pengx), do: chunk("IEND")
+
+  defp chunk(chunk_type, chunk_data \\ <<>>) do
     <<
-      byte_size(data)       :: 32,
+      byte_size(chunk_data) :: 32,
       chunk_type            :: binary,
       chunk_data            :: binary,
-      Pengx.CRC.crc32(<<chunk_type :: binary, data::binary>>) :: 32
+      Pengx.CRC.crc32(<<chunk_type :: binary, chunk_data::binary>>) :: 32
     >>
   end
 end
